@@ -19,5 +19,4 @@ docker-compose up --build
 #### Notes:
 
 - WikirRacer class implemented in `wikiracing.py`
-- Required queries are written in `queries.py` 
-- When you run tests for the first time it may be slow because will DB is empty
+- Required queries are written in `queries.py` using SQLAlchemy and raw SQL in `queries.sql` 

@@ -21,7 +21,6 @@ class WikiRacer:
             article_queryset = self.check_if_exists_or_create(current)
             if article_queryset:
                 for article in article_queryset:
-                    print(article.child)
                     if article.child not in visited:
                         visited[article.child] = current
                         queue.append(article.child)

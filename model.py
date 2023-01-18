@@ -11,6 +11,6 @@ class Article(Base):
     child = Column(String)
 
 
-engine = create_engine("postgresql://postgres:postgres@postgres:5432/postgres")
+engine = create_engine("postgresql://postgres:postgres@localhost:5432/postgres")
 
 Base.metadata.create_all(engine)
