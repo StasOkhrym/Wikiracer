@@ -9,9 +9,11 @@ from wikipediaapi import Wikipedia, WikipediaPage
 
 from model import engine, Article
 
+MAX_REQUESTS_TO_WIKI_PER_SECOND = 10
+
 
 class WikiRacer:
-    limiter = Limiter(rate=10)
+    limiter = Limiter(rate=MAX_REQUESTS_TO_WIKI_PER_SECOND)
 
     def __init__(self):
         self.session = sessionmaker(bind=engine)()
@@ -67,7 +69,10 @@ class WikiRacer:
 
                 return new_article_queryset
             return None
-        except (requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout):
+        except (
+            requests.exceptions.ConnectionError,
+            requests.exceptions.ConnectTimeout,
+        ):
             time.sleep(2)
             self._retrieve_wiki_page(article_name)
 
