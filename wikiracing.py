@@ -64,17 +64,20 @@ class WikiRacer:
     def _retrieve_wiki_page(self, article_name):
         try:
             page = self.wikipedia.page(article_name)
-            if page.exists():
-                new_article_queryset = self.create_and_write_to_db(page)
-
-                return new_article_queryset
-            return None
         except (
             requests.exceptions.ConnectionError,
             requests.exceptions.ConnectTimeout,
         ):
-            time.sleep(2)
-            self._retrieve_wiki_page(article_name)
+            for _ in range(5):
+                time.sleep(2)
+                self._retrieve_wiki_page(article_name)
+            return None
+        else:
+            if page.exists():
+                new_article_queryset = self.create_and_write_to_db(page)
+
+                return new_article_queryset
+        return None
 
     def create_and_write_to_db(self, wiki_page: WikipediaPage) -> Query | None:
         article_name = wiki_page.title
