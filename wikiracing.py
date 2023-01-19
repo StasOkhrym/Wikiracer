@@ -77,7 +77,7 @@ class WikiRacer:
                 new_article_queryset = self.create_and_write_to_db(page)
 
                 return new_article_queryset
-        return None
+            return None
 
     def create_and_write_to_db(self, wiki_page: WikipediaPage) -> Query | None:
         article_name = wiki_page.title
