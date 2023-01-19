@@ -21,27 +21,31 @@ class WikiRacer:
             article_queryset = self.check_if_exists_or_create(current)
             if article_queryset:
                 for article in article_queryset:
-                    if article.child not in visited:
-                        visited[article.child] = current
-                        queue.append(article.child)
-                        if article.child == finish:
-                            return self.construct_path(visited, article.child)
+                    print(article.link)
+                    if article.link not in visited:
+                        visited[article.link] = current
+                        queue.append(article.link)
+                        if article.link == finish:
+                            return self.construct_path(visited, article.link)
         return []
 
     @staticmethod
     def construct_path(visited: dict, finish: str) -> list[str]:
         path = [finish]
-        parent = visited[finish]
-        while parent:
-            path.append(parent)
-            parent = visited[parent]
+        name = visited[finish]
+
+        while name:
+            path.append(name)
+            name = visited[name]
         path.reverse()
+
         return path
 
     def check_if_exists_or_create(self, article_name: str) -> Query | None:
         article_queryset = self.session.query(Article).filter_by(
-            parent=article_name
+            name=article_name
         )
+
         if article_queryset.count() > 0:
             return article_queryset
         else:
@@ -62,13 +66,13 @@ class WikiRacer:
             return None
 
         for link in links:
-            new_article = Article(parent=article_name, child=link)
+            new_article = Article(name=article_name, link=link)
             self.session.add(new_article)
 
         self.session.commit()
 
         new_article_queryset = self.session.query(Article).filter_by(
-            parent=article_name
+            name=article_name
         )
 
         return new_article_queryset
@@ -76,6 +80,7 @@ class WikiRacer:
     @staticmethod
     def verify_name(article_name: str) -> bool:
         cyrillic_pattern = re.compile(r"^[А-ЯІЇЄҐа-яіїєґ0-9]+")
+
         if cyrillic_pattern.match(article_name) and ":" not in article_name:
             return True
         else:

@@ -19,4 +19,5 @@ docker-compose up --build
 #### Notes:
 
 - WikirRacer class implemented in `wikiracing.py`
-- Required queries are written in `queries.py` using SQLAlchemy and raw SQL in `queries.sql` 
+- Required queries are written in `queries.sql` 
+- Collected data for faster testing is located in `pg_data` folder
