@@ -1,6 +1,9 @@
 import re
+import time
 from collections import deque
 
+import requests.exceptions
+from limiter import Limiter
 from sqlalchemy.orm import sessionmaker, Query
 from wikipediaapi import Wikipedia, WikipediaPage
 
@@ -8,6 +11,8 @@ from model import engine, Article
 
 
 class WikiRacer:
+    limiter = Limiter(rate=10)
+
     def __init__(self):
         self.session = sessionmaker(bind=engine)()
         self.wikipedia = Wikipedia(language="uk")
@@ -26,11 +31,11 @@ class WikiRacer:
                         visited[article.link] = current
                         queue.append(article.link)
                         if article.link == finish:
-                            return self.construct_path(visited, article.link)
+                            return self._construct_path(visited, article.link)
         return []
 
     @staticmethod
-    def construct_path(visited: dict, finish: str) -> list[str]:
+    def _construct_path(visited: dict, finish: str) -> list[str]:
         path = [finish]
         name = visited[finish]
 
@@ -49,12 +54,22 @@ class WikiRacer:
         if article_queryset.count() > 0:
             return article_queryset
         else:
+            new_article_queryset = self._retrieve_wiki_page(article_name)
+
+            return new_article_queryset
+
+    @limiter
+    def _retrieve_wiki_page(self, article_name):
+        try:
             page = self.wikipedia.page(article_name)
             if page.exists():
                 new_article_queryset = self.create_and_write_to_db(page)
 
                 return new_article_queryset
             return None
+        except (requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout):
+            time.sleep(2)
+            self._retrieve_wiki_page(article_name)
 
     def create_and_write_to_db(self, wiki_page: WikipediaPage) -> Query | None:
         article_name = wiki_page.title
