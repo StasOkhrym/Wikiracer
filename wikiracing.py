@@ -81,9 +81,7 @@ class WikiRacer:
 
     def create_and_write_to_db(self, wiki_page: WikipediaPage) -> Query | None:
         article_name = wiki_page.title
-        links = [link for link in wiki_page.links if self.verify_name(link)][
-            :200
-        ]
+        links = [link for link in wiki_page.links if self.verify_name(link)][:200]
 
         if not links:
             return None
