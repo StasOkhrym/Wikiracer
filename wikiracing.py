@@ -61,7 +61,7 @@ class WikiRacer:
             return new_article_queryset
 
     @limiter
-    def _retrieve_wiki_page(self, article_name):
+    def _retrieve_wiki_page(self, article_name: str) -> Query | None:
         try:
             page = self.wikipedia.page(article_name)
         except (
