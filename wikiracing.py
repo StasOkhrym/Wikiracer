@@ -28,7 +28,6 @@ class WikiRacer:
             article_queryset = self.check_if_exists_or_create(current)
             if article_queryset:
                 for article in article_queryset:
-                    print(article.link)
                     if article.link not in visited:
                         visited[article.link] = current
                         queue.append(article.link)
@@ -49,9 +48,7 @@ class WikiRacer:
         return path
 
     def check_if_exists_or_create(self, article_name: str) -> Query | None:
-        article_queryset = self.session.query(Article).filter_by(
-            name=article_name
-        )
+        article_queryset = self.session.query(Article).filter_by(name=article_name)
 
         if article_queryset.count() > 0:
             return article_queryset
@@ -92,9 +89,7 @@ class WikiRacer:
 
         self.session.commit()
 
-        new_article_queryset = self.session.query(Article).filter_by(
-            name=article_name
-        )
+        new_article_queryset = self.session.query(Article).filter_by(name=article_name)
 
         return new_article_queryset
 
@@ -104,5 +99,5 @@ class WikiRacer:
 
         if cyrillic_pattern.match(article_name) and ":" not in article_name:
             return True
-        else:
-            return False
+
+        return False
